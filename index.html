@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GAME COINS</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101116;color:white;font-family:Arial,sans-serif}
+header{background:#191b23;padding:22px;text-align:center;border-bottom:2px solid #ff8b22}
+header h1{color:#ff982e;margin:0;font-size:32px}
+header p{color:#bbb}
+.container{max-width:850px;margin:25px auto;padding:15px}
+.card{background:#1d202a;padding:22px;border-radius:15px;margin-bottom:18px;border:1px solid #343744}
+h2{color:#ff982e}
+.balance{text-align:center;font-size:30px;color:#ffb14a;font-weight:bold}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.game{background:#292d39;padding:20px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid transparent}
+.game.selected{border-color:#ff982e}
+.game b{display:block;margin-top:10px}
+button{background:#ff9026;color:#111;border:0;padding:13px 20px;border-radius:9px;font-weight:bold;cursor:pointer;margin-top:12px}
+button:hover{background:#ffb15d}
+input{width:100%;padding:13px;margin:8px 0;background:#11141b;border:1px solid #454958;color:white;border-radius:8px}
+.small{color:#aaa;font-size:13px}
+footer{text-align:center;color:#999;padding:25px}
+.order{border-bottom:1px solid #444;padding:10px 0}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🎮 GAME COINS</h1>
+<p>عالم الألعاب والمكافآت الرقمية</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>💰 رصيد نقاطك</h2>
+<div class="balance"><span id="points">10</span> نقطة</div>
+<p class="small" style="text-align:center">اجمع النقاط واستبدلها بمكافآت تجريبية.</p>
+</div>
+
+<div class="card">
+<h2>🎮 اختر لعبتك</h2>
+<div class="games">
+<div class="game selected" onclick="choose('Free Fire',this)">
+<span style="font-size:40px">🔥</span>
+<b>Free Fire</b>
+</div>
+<div class="game" onclick="choose('eFootball',this)">
+<span style="font-size:40px">⚽</span>
+<b>eFootball</b>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>🎁 اجمع النقاط</h2>
+<p>اضغط على الزر للحصول على مكافأة تجريبية.</p>
+<button onclick="reward()">احصل على 10 نقاط</button>
+<p class="small">هذه مكافأة تجريبية وليست إعلاناً مدفوعاً.</p>
+</div>
+
+<div class="card">
+<h2>🏆 استبدال النقاط</h2>
+<p>2000 نقطة = مكافأة تجريبية بقيمة 100 وحدة.</p>
+<input id="player" placeholder="أدخل Player ID">
+<input id="playerName" placeholder="اسم اللاعب">
+<button onclick="redeem()">إرسال طلب الاستبدال</button>
+<p class="small">الطلبات تجريبية ولا يتم شحن العملات فعلياً.</p>
+</div>
+
+<div class="card">
+<h2>📋 سجل الطلبات</h2>
+<div id="orders">لا توجد طلبات حتى الآن.</div>
+</div>
+
+<div class="card">
+<h2>ℹ️ حول الموقع</h2>
+<p>GAME COINS منصة تجريبية لعشاق الألعاب. لا تمثل الموقع الرسمي لأي لعبة، ولا تقدم شحناً حقيقياً حالياً.</p>
+</div>
+
+</div>
+
+<footer>© 2026 GAME COINS - جميع الحقوق محفوظة</footer>
+
+<script>
+let points = Number(localStorage.getItem('gc_points') || 10);
+let game = 'Free Fire';
+
+function update(){
+document.getElementById('points').textContent=points;
+localStorage.setItem('gc_points',points);
+}
+
+function choose(name,el){
+game=name;
+document.querySelectorAll('.game').forEach(x=>x.classList.remove('selected'));
+el.classList.add('selected');
+}
+
+function reward(){
+points+=10;
+update();
+alert('مبروك! حصلت على 10 نقاط تجريبية 🎉');
+}
+
+function redeem(){
+let id=document.getElementById('player').value.trim();
+let name=document.getElementById('playerName').value.trim();
+
+if(!id || !name){
+alert('يرجى إدخال Player ID واسم اللاعب');
+return;
+}
+if(points<2000){
+alert('تحتاج إلى 2000 نقطة للاستبدال. رصيدك الحالي: '+points);
+return;
+}
+
+points-=2000;
+update();
+
+let orders=JSON.parse(localStorage.getItem('gc_orders')||'[]');
+orders.unshift({game,id,name,date:new Date().toLocaleString('ar')});
+localStorage.setItem('gc_orders',JSON.stringify(orders));
+showOrders();
+alert('تم تسجيل طلب تجريبي بنجاح');
+}
+
+function showOrders(){
+let orders=JSON.parse(localStorage.getItem('gc_orders')||'[]');
+document.getElementById('orders').innerHTML=orders.length?
+orders.map(o=>`<div class="order">${o.game} - ${o.name} - ${o.id}<br><small>${o.date}</small></div>`).join(''):
+'لا توجد طلبات حتى الآن.';
+}
+
+update();
+showOrders();
+</script>
+</body>
+</html>
